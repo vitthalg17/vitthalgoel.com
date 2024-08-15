@@ -24,3 +24,39 @@ if (lightSwitches.length > 0) {
     });
   });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('contactForm');
+  const submitButton = document.getElementById('submitButton');
+  const successMessage = document.getElementById('successMessage');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending...';
+
+    fetch(form.action, {
+      method: form.method,
+      body: new FormData(form),
+      headers: {
+        'Accept': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        form.reset();
+        form.style.display = 'none';
+        successMessage.classList.remove('hidden');
+      } else {
+        throw new Error('Form submission failed');
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      alert('There was an error submitting the form. Please try again.');
+    }).finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Send Message';
+    });
+  });
+});
+
+document.getElementById('current-year').textContent = new Date().getFullYear();
