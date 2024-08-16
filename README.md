@@ -1,5 +1,4 @@
-# DevFolio HTML
-
+# vitthalgoel.com
 HTML landing page template designed by Cruip.
 
 This HTML template is shipped with the (Tailwind CLI tool)[https://tailwindcss.com/docs/installation].
