@@ -25,40 +25,79 @@ if (lightSwitches.length > 0) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('contactForm');
-  const submitButton = document.getElementById('submitButton');
-  const successMessage = document.getElementById('successMessage');
+document.addEventListener("DOMContentLoaded", function () {
+  const swipeContainer = document.querySelector('.swipe-container');
+  const images = swipeContainer.querySelectorAll('img');
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    submitButton.disabled = true;
-    submitButton.textContent = 'Sending...';
+  // Adjust initial scroll position to center the first image
+  const centerFirstImage = () => {
+    const firstImage = images[0];
+    const containerWidth = swipeContainer.clientWidth;
+    const imageWidth = firstImage.clientWidth;
+    const initialScrollPosition = firstImage.offsetLeft - (containerWidth - imageWidth) / 2;
+    swipeContainer.scrollLeft = initialScrollPosition;
+  };
 
-    fetch(form.action, {
-      method: form.method,
-      body: new FormData(form),
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).then(response => {
-      if (response.ok) {
-        form.reset();
-        form.style.display = 'none';
-        successMessage.classList.remove('hidden');
-      } else {
-        throw new Error('Form submission failed');
-      }
-    }).catch(error => {
-      console.error('Error:', error);
-      alert('There was an error submitting the form. Please try again.');
-    }).finally(() => {
-      submitButton.disabled = false;
-      submitButton.textContent = 'Send Message';
-    });
+  centerFirstImage();
+
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  // Handle mouse events
+  swipeContainer.addEventListener('mousedown', (e) => {
+    isDown = true;
+    startX = e.pageX - swipeContainer.offsetLeft;
+    scrollLeft = swipeContainer.scrollLeft;
   });
+
+  swipeContainer.addEventListener('mouseleave', () => {
+    isDown = false;
+  });
+
+  swipeContainer.addEventListener('mouseup', () => {
+    isDown = false;
+    snapToImage();
+  });
+
+  swipeContainer.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - swipeContainer.offsetLeft;
+    const walk = (x - startX) * 1.5; // Adjust scroll speed
+    swipeContainer.scrollLeft = scrollLeft - walk;
+  });
+
+  // Handle touch events
+  swipeContainer.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    scrollLeft = swipeContainer.scrollLeft;
+  });
+
+  swipeContainer.addEventListener('touchmove', (e) => {
+    const x = e.touches[0].clientX;
+    const walk = (startX - x) * 1.5; // Adjust scroll speed
+    swipeContainer.scrollLeft = scrollLeft + walk;
+  });
+
+  swipeContainer.addEventListener('touchend', snapToImage);
+
+  // Snap to the nearest image based on the scroll position
+  function snapToImage() {
+    let nearestImage = images[0];
+    let nearestDistance = Math.abs(swipeContainer.scrollLeft - nearestImage.offsetLeft);
+
+    images.forEach((image) => {
+      const distance = Math.abs(swipeContainer.scrollLeft - image.offsetLeft);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestImage = image;
+      }
+    });
+
+    swipeContainer.scrollTo({
+      left: nearestImage.offsetLeft - (swipeContainer.clientWidth - nearestImage.clientWidth) / 2,
+      behavior: 'smooth',
+    });
+  }
 });
-
-document.getElementById('current-year').textContent = new Date().getFullYear();
-
-
