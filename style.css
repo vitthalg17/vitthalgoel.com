@@ -2366,21 +2366,4 @@ html {
   scroll-behavior: smooth;
 }
 
-@media only screen and (max-width: 768px) {
-  .swipe-container {
-    overflow-x: auto;
-    white-space: nowrap;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    padding: 0;
-  }
-
-  .swipe-container img {
-    display: inline-block;
-    scroll-snap-align: center;
-    width: 100%;
-    max-width: 245px;
-  }
-}
 
