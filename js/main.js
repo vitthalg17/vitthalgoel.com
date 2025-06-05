@@ -61,3 +61,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.getElementById('current-year').textContent = new Date().getFullYear();
 
+// Header images carousel rotation
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.querySelector('.swipe-container');
+  const images = container.querySelectorAll('img');
+  const imageSources = [
+    './images/header-image-01.png',
+    './images/header-image-02.png', 
+    './images/header-image-03.png'
+  ];
+  
+  let currentRotation = 0;
+  
+  function rotateImages() {
+    // Add rotating class for animation
+    images.forEach(img => img.classList.add('rotating'));
+    
+    setTimeout(() => {
+      // Rotate the sources: 01->02 position, 02->03 position, 03->01 position
+      currentRotation = (currentRotation + 1) % 3;
+      
+      images.forEach((img, index) => {
+        const newSourceIndex = (index + currentRotation) % 3;
+        img.src = imageSources[newSourceIndex];
+      });
+      
+      // Remove rotating class after source change
+      setTimeout(() => {
+        images.forEach(img => img.classList.remove('rotating'));
+      }, 50);
+    }, 300);
+  }
+  
+  // Rotate every 4 seconds (increased for smoother feel)
+  setInterval(rotateImages, 4000);
+});
+
+// Smooth scroll fallback for anchor links
+document.addEventListener('DOMContentLoaded', function() {
+  const anchorLinks = document.querySelectorAll('a[href^="#"]');
+  
+  anchorLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        e.preventDefault();
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+});
+
