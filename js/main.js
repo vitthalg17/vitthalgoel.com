@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 300);
   }
   
-  // Rotate every 4 seconds (increased for smoother feel)
-  setInterval(rotateImages, 4000);
+  // Rotate every 1.5 seconds
+  setInterval(rotateImages, 1500);
 });
 
 // Smooth scroll fallback for anchor links

@@ -46,13 +46,13 @@
 
     <link href="./style.css" rel="stylesheet" />
     <script>
-      if (
-        localStorage.getItem("dark-mode") === "false" ||
-        !("dark-mode" in localStorage)
-      ) {
-        document.querySelector("html").classList.remove("dark");
-      } else {
+      const savedTheme = localStorage.getItem('theme-mode') || '0';
+      const themeMode = parseInt(savedTheme);
+      
+      if (themeMode === 1) {
         document.querySelector("html").classList.add("dark");
+      } else if (themeMode === 2) {
+        document.querySelector("html").classList.add("comfort");
       }
     </script>
   </head>
@@ -72,18 +72,15 @@
                 <!-- Dark mode toggle -->
                 <div class="flex justify-end mb-2">
                   <div class="inline-flex items-center justify-center ml-auto">
-                    <input
-                      type="checkbox"
-                      name="light-switch"
-                      id="light-switch"
-                      class="light-switch sr-only"
-                    />
-                    <label
-                      class="relative cursor-pointer p-2"
-                      for="light-switch"
+                    <button
+                      id="theme-toggle"
+                      class="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 comfort:hover:bg-[#e8e6e0] transition-colors"
+                      aria-label="Toggle theme"
                     >
+                      <!-- Light mode icon -->
                       <svg
-                        class="dark:hidden"
+                        id="light-icon"
+                        class="theme-icon"
                         width="16"
                         height="16"
                         xmlns="http://www.w3.org/2000/svg"
@@ -97,8 +94,10 @@
                           d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z"
                         />
                       </svg>
+                      <!-- Dark mode icon -->
                       <svg
-                        class="hidden dark:block"
+                        id="dark-icon"
+                        class="theme-icon hidden"
                         width="16"
                         height="16"
                         xmlns="http://www.w3.org/2000/svg"
@@ -112,10 +111,24 @@
                           d="M12.5 5a.625.625 0 0 1-.625-.625 1.252 1.252 0 0 0-1.25-1.25.625.625 0 1 1 0-1.25 1.252 1.252 0 0 0 1.25-1.25.625.625 0 1 1 1.25 0c.001.69.56 1.249 1.25 1.25a.625.625 0 1 1 0 1.25c-.69.001-1.249.56-1.25 1.25A.625.625 0 0 1 12.5 5Z"
                         />
                       </svg>
-                      <span class="sr-only"
-                        >Switch to light / dark version</span
+                      <!-- Comfort mode icon (sun) -->
+                      <svg
+                        id="comfort-icon"
+                        class="theme-icon hidden"
+                        width="16"
+                        height="16"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                    </label>
+                        <circle cx="8" cy="8" r="3" class="fill-amber-500"/>
+                        <path
+                          class="fill-amber-400"
+                          d="M8 0v2M8 14v2M0 8h2M14 8h2M2.343 2.343l1.414 1.414M12.243 12.243l1.414 1.414M2.343 13.657l1.414-1.414M12.243 3.757l1.414-1.414"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                      <span class="sr-only">Switch theme</span>
+                    </button>
                   </div>
                 </div>
                 <!-- Intro -->
@@ -748,17 +761,16 @@
                         class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
                         href="https://www.twitter.com/@vitthal_goel"
                         target="_blank"
-                        aria-label="X"
+                        aria-label="Twitter"
                       >
                         <svg
                           class="fill-current"
                           xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 16 16"
                           width="16"
-                          height="14"
+                          height="16"
                         >
-                          <path
-                            d="M16 14h-4.938L7.197 9.108 2.771 14H.316l5.736-6.342L0 0h5.063l3.496 4.476L12.601 0h2.454L9.697 5.932 16 14Zm-4.26-1.422h1.36L4.323 1.347H2.865l8.875 11.231Z"
-                          />
+                          <path d="M16 3.039a6.461 6.461 0 0 1-1.885.516A3.301 3.301 0 0 0 15.555 2c-.638.378-1.348.654-2.104.805A3.286 3.286 0 0 0 7.875 5.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 5.578v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115c-.211 0-.417-.021-.616-.061a3.293 3.293 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.142-.004-.284-.01-.425A6.673 6.673 0 0 0 16 3.039z"/>
                         </svg>
                       </a>
                     </li>

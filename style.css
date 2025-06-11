@@ -2442,4 +2442,27 @@ html {
   background-color: #e8e6e0 !important;
 }
 
+/* Social media icons */
+.social-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+}
+
+.social-icon-container svg {
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+}
+
+/* Twitter icon specific adjustments */
+a[aria-label="Twitter"] svg {
+  width: 1rem;
+  height: 0.8125rem; /* 13px to match the Twitter bird proportions */
+  transform: scale(1.1);
+}
+
 
