@@ -96,7 +96,7 @@
         top: calc(var(--toggle-offset) - 1.688em + 0.188em);
         left: var(--toggle-offset);
         transition: var(--transition);
-        z-index: 2;
+        z-index: 3;
       }
 
       .bb8__head-container {
@@ -240,7 +240,7 @@
         left: calc(var(--toggle-offset) - 0.938em);
         transition: var(--transition);
         transform: skew(-70deg);
-        z-index: 1;
+        z-index: 2;
       }
 
       .bb8-toggle__scenery {
@@ -255,11 +255,13 @@
       .bb8-toggle__scenery::before {
         content: "";
         position: absolute;
-        width: 100%;
-        height: 30%;
-        bottom: 0;
+        width: 120%;
+        height: 40%;
+        bottom: -5px;
+        left: -10%;
         background: #b18d71;
         z-index: 1;
+        border-radius: 0 0 var(--radius) var(--radius);
       }
 
       .bb8-toggle__cloud {
