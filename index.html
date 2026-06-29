@@ -482,10 +482,12 @@
   <body
     class="font-inter antialiased bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-gray-100 tracking-tight"
   >
+    <!-- Hyperspace starfield background (visible in dark mode only) -->
+    <canvas id="hyperspace" aria-hidden="true"></canvas>
     <div class="overflow-hidden supports-[overflow:clip]:overflow-clip">
       <div class="max-w-[728px] mx-auto">
         <div
-          class="w-full bg-white dark:bg-gray-900 border-x border-gray-100 dark:border-gray-800 box-content"
+          class="w-full sw-frame bg-white dark:bg-gray-900 border-x border-gray-100 dark:border-gray-800 box-content"
         >
           <div class="px-3 md:px-16">
             <div class="flex flex-col min-h-screen">
@@ -531,13 +533,18 @@
                 </div>
                 <!-- Intro -->
                 <div class="mb-10">
-                  <img
-                    class="inline-flex rounded-full shadow-lg mb-4"
-                    src="./images/unnamed.jpg"
-                    width="48"
-                    height="48"
-                    alt="Vitthal Goel"
-                  />
+                  <span class="sw-hint-anchor">
+                    <img
+                      id="profile-pic"
+                      class="inline-flex rounded-full shadow-lg mb-4"
+                      style="touch-action: manipulation;"
+                      src="./images/unnamed.jpg"
+                      width="48"
+                      height="48"
+                      alt="Vitthal Goel"
+                    />
+                    <span id="sw-hint" class="sw-hint">Double-tap for hyperspace</span>
+                  </span>
                   <div class="mb-5">
                     <h1
                       class="font-inter-tight font-bold text-gray-800 dark:text-gray-100 text-2xl mb-1"
@@ -549,10 +556,16 @@
                     </p>
                   </div>
                   <a
-                  class="btn-sm text-gray-200 dark:text-gray-800 bg-gradient-to-r from-gray-800 to-gray-700 dark:from-gray-300 dark:to-gray-100 dark:hover:bg-gray-100 shadow relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white/.2)_50%,transparent_75%,transparent_100%)] dark:before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-[1500ms]"
-                    href="#contact-section"
-                    >Available For Internships</a
-                  >
+                  class="star-btn btn-sm text-gray-200 dark:text-gray-800 bg-gradient-to-r from-gray-800 to-gray-700 dark:from-gray-300 dark:to-gray-100 dark:hover:bg-gray-100 shadow relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white/.2)_50%,transparent_75%,transparent_100%)] dark:before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-[1500ms]"
+                  href="#contact-section">
+                    Available For Internships
+                    <div class="star-1"><svg viewBox="0 0 784.11 815.53" xmlns="http://www.w3.org/2000/svg"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></svg></div>
+                    <div class="star-2"><svg viewBox="0 0 784.11 815.53" xmlns="http://www.w3.org/2000/svg"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></svg></div>
+                    <div class="star-3"><svg viewBox="0 0 784.11 815.53" xmlns="http://www.w3.org/2000/svg"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></svg></div>
+                    <div class="star-4"><svg viewBox="0 0 784.11 815.53" xmlns="http://www.w3.org/2000/svg"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></svg></div>
+                    <div class="star-5"><svg viewBox="0 0 784.11 815.53" xmlns="http://www.w3.org/2000/svg"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></svg></div>
+                    <div class="star-6"><svg viewBox="0 0 784.11 815.53" xmlns="http://www.w3.org/2000/svg"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></svg></div>
+                  </a>
                 </div>
                 <div class="swipe-container group flex justify-center gap-4">
                   <img
@@ -1265,6 +1278,7 @@
 
     <script src="./js/vendors/alpinejs.min.js" defer></script>
     <script src="./js/main.js"></script>
+    <script src="./js/hyperspace.js"></script>
     <!-- Google tag (gtag.js) -->
     <script
       async
@@ -1287,7 +1301,7 @@
         const checkbox = document.getElementById('theme-toggle');
         
         html.classList.remove('dark');
-        
+
         if (mode === 1) {
           html.classList.add('dark');
           checkbox.checked = true;
@@ -1307,12 +1321,98 @@
           const mode = this.checked ? 1 : 0;
           localStorage.setItem('theme-mode', mode);
           setTheme(mode);
+          // Clicking the toggle exits the Star Wars easter egg.
+          if (window.__swEgg) window.__swEgg.deactivate();
         });
 
         // Set current year in footer
         var yearSpan = document.getElementById('current-year');
         if (yearSpan) yearSpan.textContent = new Date().getFullYear();
       });
+    </script>
+
+    <!-- Easter egg: type "star" to toggle the Star Wars theme -->
+    <script>
+      (function () {
+        const SEQUENCE = 'star';
+        let buffer = '';
+        let active = false;
+
+        const hint = document.getElementById('sw-hint');
+        let hintTimer = null;
+
+        function hideHint() {
+          if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
+          if (hint) hint.classList.remove('show');
+        }
+
+        function activate() {
+          if (active) return;
+          active = true;
+          hideHint();
+          // Flip the BB8 dark-mode toggle on, so the user can click it to
+          // return to normal light mode and exit the easter egg.
+          if (typeof setTheme === 'function') setTheme(1);
+          localStorage.setItem('theme-mode', 1);
+          document.documentElement.classList.add('sw');
+          if (window.hyperspace) window.hyperspace.start();
+        }
+
+        function deactivate() {
+          if (!active) return;
+          active = false;
+          document.documentElement.classList.remove('sw');
+          if (window.hyperspace) window.hyperspace.stop();
+        }
+
+        function toggle() {
+          active ? deactivate() : activate();
+        }
+
+        // Let the theme toggle exit the easter egg when the user clicks it.
+        window.__swEgg = { deactivate: deactivate, toggle: toggle, isActive: function () { return active; } };
+
+        // Trigger 1: type "star"
+        window.addEventListener('keydown', function (e) {
+          // Ignore typing inside form fields
+          const tag = (e.target.tagName || '').toLowerCase();
+          if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+
+          if (e.key === 'Escape') {
+            deactivate();
+            buffer = '';
+            return;
+          }
+          if (e.key && e.key.length === 1) {
+            buffer = (buffer + e.key.toLowerCase()).slice(-SEQUENCE.length);
+            if (buffer === SEQUENCE) {
+              toggle();
+              buffer = '';
+            }
+          }
+        });
+
+        // Trigger 2: double-tap / double-click the profile picture (mobile friendly)
+        const pic = document.getElementById('profile-pic');
+        if (pic) {
+          let lastTap = 0;
+          pic.addEventListener('click', function (e) {
+            const now = Date.now();
+            if (lastTap && now - lastTap < 400) {
+              e.preventDefault();
+              toggle();
+              lastTap = 0;
+            } else {
+              lastTap = now;
+            }
+          });
+        }
+
+        // After 30s on the page, nudge undiscovered visitors toward the egg.
+        hintTimer = setTimeout(function () {
+          if (!active && hint) hint.classList.add('show');
+        }, 30000);
+      })();
     </script>
 
   </body>
