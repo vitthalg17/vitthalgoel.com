@@ -45,7 +45,7 @@
     />
     <!-- <meta name="twitter:image" content="https://vitthalgoel.com/images/profile-picture.jpg"> -->
 
-    <link href="./style.css" rel="stylesheet" />
+    <link href="./style.css?v=1" rel="stylesheet" />
     <style>
       /* BB8 Toggle Styles */
       .bb8-toggle {
@@ -543,7 +543,7 @@
                       height="48"
                       alt="Vitthal Goel"
                     />
-                    <span id="sw-hint" class="sw-hint">Double-tap for hyperspace</span>
+                    <span id="sw-hint" class="sw-hint"><span class="sw-hint-text">Double-tap for hyperspace</span><button type="button" class="sw-hint-close" aria-label="Dismiss hint">&times;</button></span>
                   </span>
                   <div class="mb-5">
                     <h1
@@ -1277,8 +1277,8 @@
     </div>
 
     <script src="./js/vendors/alpinejs.min.js" defer></script>
-    <script src="./js/main.js"></script>
-    <script src="./js/hyperspace.js"></script>
+    <script src="./js/main.js?v=1"></script>
+    <script src="./js/hyperspace.js?v=1"></script>
     <!-- Google tag (gtag.js) -->
     <script
       async
@@ -1339,11 +1339,19 @@
         let active = false;
 
         const hint = document.getElementById('sw-hint');
+        const pic = document.getElementById('profile-pic');
         let hintTimer = null;
+
+        function showHint() {
+          if (active) return;
+          if (hint) hint.classList.add('show');
+          if (pic) pic.classList.add('sw-glow');
+        }
 
         function hideHint() {
           if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
           if (hint) hint.classList.remove('show');
+          if (pic) pic.classList.remove('sw-glow');
         }
 
         function activate() {
@@ -1393,7 +1401,6 @@
         });
 
         // Trigger 2: double-tap / double-click the profile picture (mobile friendly)
-        const pic = document.getElementById('profile-pic');
         if (pic) {
           let lastTap = 0;
           pic.addEventListener('click', function (e) {
@@ -1408,10 +1415,19 @@
           });
         }
 
+        // Dismiss the hint via its close (×) button.
+        if (hint) {
+          const closeBtn = hint.querySelector('.sw-hint-close');
+          if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+              e.stopPropagation();
+              hideHint();
+            });
+          }
+        }
+
         // After 30s on the page, nudge undiscovered visitors toward the egg.
-        hintTimer = setTimeout(function () {
-          if (!active && hint) hint.classList.add('show');
-        }, 30000);
+        hintTimer = setTimeout(showHint, 30000);
       })();
     </script>
 

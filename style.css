@@ -1317,6 +1317,12 @@ html.sw .rounded-full.dark\:bg-gray-700 {
   border: 1.5px solid #FFE81F !important;
 }
 
+/* Header carousel images (Gaming / Comics / Coding) — yellow border */
+
+html.sw .swipe-container img {
+  border: 1.5px solid #FFE81F;
+}
+
 /* Profile photo */
 
 html.sw img.rounded-full {
@@ -1331,6 +1337,12 @@ html.sw footer ul li a svg {
   fill: #FFE81F !important;
 }
 
+/* Footer copyright text — yellow in the easter egg */
+
+html.sw footer p {
+  color: #FFE81F !important;
+}
+
 /* Easter-egg hint — appears under the profile picture after 30s on the page */
 
 .sw-hint-anchor {
@@ -1343,19 +1355,64 @@ html.sw footer ul li a svg {
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
   background: #FFE81F;
   color: #111827;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  padding: 4px 11px;
+  padding: 4px 6px 4px 11px;
   border-radius: 999px;
   box-shadow: 0 0 14px rgba(255, 232, 31, 0.7);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.45s ease, transform 0.45s ease;
   z-index: 6;
+}
+
+/* Dismiss (×) button inside the hint */
+
+.sw-hint-close {
+  pointer-events: auto;
+  flex: none;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.18);
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sw-hint-close:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Yellow glow on the profile picture while the hint is showing */
+
+#profile-pic.sw-glow {
+  box-shadow: 0 0 0 2px #FFE81F, 0 0 18px 5px rgba(255, 232, 31, 0.7);
+  animation: sw-glow-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes sw-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px #FFE81F, 0 0 12px 3px rgba(255, 232, 31, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 0 2px #FFE81F, 0 0 24px 7px rgba(255, 232, 31, 0.85);
+  }
 }
 
 /* Little downward arrow pointing at the profile picture */
