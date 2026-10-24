@@ -1,6 +1,6 @@
 // Venom Button: a symbiote goo button rendered with raw WebGL2.
 // Adapted from https://github.com/exteestudio/venom-button (MIT © 2026 exteestudio) to dress the
-// "available for internships" link in the header. Runs in light and dark mode only; the Star Wars
+// "Available For Internships" link in the header. Runs in light and dark mode only; the Star Wars
 // easter egg (html.sw) keeps its own star button, so the scene pauses and hides while it is active.
 // Geist Bold by Vercel is licensed under the SIL Open Font License 1.1 (see fonts/Geist-OFL.txt).
 'use strict';
@@ -56,7 +56,7 @@ const fontReady = (async () => {
     document.fonts.add(face);
   } catch (err) { console.warn('Geist failed to load, falling back to the system font', err); }
 })();
-const LABEL_TEXT = 'available for internships';
+const LABEL_TEXT = 'Available For Internships';
 const LABEL_NUDGE = 1;  // px the label sits below centre
 const LABEL_PX = 120;   // glyph size drawn into the label canvas
 const LABEL_CSS = 19;   // on-screen label size, virtual px
@@ -896,7 +896,7 @@ function makeGBuffer() {
 }
 
 // ───────────────────────────── label (SVG → mask texture) ─────────────────────────────
-const LABEL_W = 2048, LABEL_H = 256; // wide enough for "available for internships" at LABEL_PX
+const LABEL_W = 2048, LABEL_H = 256; // wide enough for "Available For Internships" at LABEL_PX
 const labelCanvas = document.createElement('canvas');
 labelCanvas.width = LABEL_W; labelCanvas.height = LABEL_H;
 const lctx = labelCanvas.getContext('2d');
