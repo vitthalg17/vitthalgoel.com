@@ -1,0 +1,72 @@
+/* ============================================================
+   VENOM BUTTON — the goo "available for internships" button
+   (js/venom-button.js). Light and dark mode only: everything is
+   scoped to :not(.sw), so the Star Wars easter egg keeps its own
+   star button.
+   ============================================================ */
+
+.venom-slot {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+/* Reserve the pill's height (60px slab x 0.75 VIEW_SCALE in venom-button.js)
+   so the header doesn't jump when the goo takes over the regular button. */
+html:not(.sw) .venom-slot {
+    min-height: 45px;
+}
+
+/* Transparent WebGL canvas centred on the link, with room for the tendrils */
+.venom-stage {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+html.venom-ready:not(.sw) .venom-stage {
+    display: block;
+}
+
+/* The link stays the real, clickable element: sized to the pill, invisible */
+html.venom-ready:not(.sw) #venom-hit {
+    width: var(--venom-w);
+    height: var(--venom-h);
+    padding: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: none;
+    color: transparent;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html.venom-ready:not(.sw) #venom-hit::before {
+    display: none;
+}
+
+html.venom-ready:not(.sw) #venom-hit:focus {
+    outline: none;
+}
+
+html.venom-ready:not(.sw) #venom-hit:focus-visible {
+    outline: 1.5px solid #1f2937;
+    outline-offset: 6px;
+}
+
+html.dark.venom-ready:not(.sw) #venom-hit:focus-visible {
+    outline-color: #e5e7eb;
+}
+
+/* The rendered 3D cursor stands in for the OS cursor near the button */
+body.venom-engaged,
+body.venom-engaged * {
+    cursor: none !important;
+}
