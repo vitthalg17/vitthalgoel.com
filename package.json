@@ -5,6 +5,9 @@
   "homepage": "https://cruip.com",
   "author": "Pasquale Vitiello",
   "license": "https://cruip.com/terms/",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "npx tailwindcss -i ./css/style.css -o ./style.css --watch",
     "build": "npx tailwindcss -i ./css/style.css -o ./style.css"
