@@ -1,8 +1,8 @@
 // Venom Button: a symbiote goo button rendered with raw WebGL2.
 // Adapted from https://github.com/exteestudio/venom-button (MIT © 2026 exteestudio) to dress the
-// "Available For Internships" link in the header. Runs in light and dark mode only; the Star Wars
-// easter egg (html.sw) keeps its own star button, so the scene pauses and hides while it is active.
-// Geist Bold by Vercel is licensed under the SIL Open Font License 1.1 (see fonts/Geist-OFL.txt).
+// "Available For Internships" link in the header: black Venom in light mode, white Anti-Venom in dark
+// mode. The Star Wars easter egg (html.sw) keeps its own star button, so the scene pauses and hides
+// while it is active.
 'use strict';
 (() => {
 const hitEl = document.getElementById('venom-hit');
@@ -48,14 +48,12 @@ const PAD_X = 200, PAD_Y = 190;
 let viewWv = 1, viewHv = 1; // canvas size in virtual px
 const viewW = () => viewWv, viewH = () => viewHv;
 
-// Geist Bold for a thick, legible metal label
-const fontReady = (async () => {
-  try {
-    const face = new FontFace('VenomGeist', 'url(./fonts/geist-bold.woff2) format("woff2")', { weight: '700' });
-    await face.load();
-    document.fonts.add(face);
-  } catch (err) { console.warn('Geist failed to load, falling back to the system font', err); }
-})();
+// the label uses the site's own type: Inter (loaded by style.css), one weight up from the 500 of the
+// regular buttons so the embossed letters stay crisp, with the page's tracking-tight letter spacing
+const LABEL_FONT = '600 120px Inter';
+const fontReady = document.fonts.load(LABEL_FONT).catch((err) => {
+  console.warn('Inter failed to load, falling back to the system font', err);
+});
 const LABEL_TEXT = 'Available For Internships';
 const LABEL_NUDGE = 1;  // px the label sits below centre
 const LABEL_PX = 120;   // glyph size drawn into the label canvas
@@ -584,6 +582,10 @@ vec3 shadeLabel(vec2 lu, float sh, float ao) {
   vec3 Hh = normalize(KEY + vec3(0.0, 0.0, 1.0));
   float NdH = max(dot(N, Hh), 0.0), a2 = 0.01;
   col += vec3(1.0) * a2 / (3.14159 * pow(NdH * NdH * (a2 - 1.0) + 1.0, 2.0)) * 0.05 * sh;
+  // dark theme (Anti-Venom): glossy black lettering on the white goo, same chrome profile and lit edge
+  vec3 ink = vec3(0.003, 0.0032, 0.004) * grad;
+  ink += vec3(1.0) * 0.06 * edge * smoothstep(0.1, 0.9, facing);
+  col = mix(col, ink, uDark);
   return col * mix(0.85, 1.0, ao);
 }
 
@@ -640,7 +642,9 @@ vec3 shadeGoo(vec2 p, vec4 g) {
              + vec3(0.95, 0.9, 0.84) * pow(max(dot(R, cRoom), 0.0), 10.0) * F * 0.9;
   spec = mix(spec, rough, matte);
 
-  vec3 diff = vec3(0.0007) * (1.8 * max(dot(N, KEY), 0.0) * sh + 0.9 * ao);
+  // jet black Venom on the light theme, white Anti-Venom on the dark theme
+  vec3 alb = mix(vec3(0.0007), vec3(0.6, 0.62, 0.66), uDark);
+  vec3 diff = alb * (1.8 * max(dot(N, KEY), 0.0) * sh + 0.9 * ao);
   vec3 col = diff + spec;
 
   // the living-room window as a flat, planar reflection on the face (top left): it only bends where the
@@ -664,7 +668,9 @@ vec3 shadeGoo(vec2 p, vec4 g) {
   if (uLabelAmt > 0.0) {
     vec2 lu = (p - uLabelBox.xy) / (2.0 * uLabelBox.zw) + 0.5;
     if (lu.x > 0.0 && lu.y > 0.0 && lu.x < 1.0 && lu.y < 1.0) {
-      float m = textureLod(uLabel, lu, uLabelLod).a * (1.0 - smoothstep(0.15, 0.5, strandness)) * uLabelAmt;
+      float m = textureLod(uLabel, lu, uLabelLod).a;
+      m = mix(m, smoothstep(0.0, 0.55, m), uDark); // dark ink on white thins out at small sizes: firm it up
+      m *= (1.0 - smoothstep(0.15, 0.5, strandness)) * uLabelAmt;
       if (m > 0.002) col = mix(col, shadeLabel(lu, sh, ao), m);
     }
   }
@@ -748,7 +754,7 @@ void main() {
     if (cov > 0.0) {
       vec4 n0 = gAt(c + ivec2(1, 0)), n1 = gAt(c - ivec2(1, 0)), n2 = gAt(c + ivec2(0, 1)), n3 = gAt(c - ivec2(0, 1));
       vec4 gn = n0.w > 0.5 ? n0 : n1.w > 0.5 ? n1 : n2.w > 0.5 ? n2 : n3.w > 0.5 ? n3 : vec4(0.0);
-      col = tonemap(gn.w > 0.5 ? shadeAny(p, gn) : vec3(0.012)) * cov;
+      col = tonemap(gn.w > 0.5 ? shadeAny(p, gn) : vec3(mix(0.012, 0.6, uDark))) * cov;
       a = cov + (1.0 - cov) * a;
     }
   } else {
@@ -845,9 +851,11 @@ const FRAG_FXAA = `#version 300 es
 precision highp float;
 uniform sampler2D uC;
 uniform vec2 uRes;
+uniform float uDark;
 out vec4 outC;
-// edges are found as if composited over the white studio floor, so silhouettes smooth like the original
-float luma(vec4 c) { return dot(c.rgb + (1.0 - c.a), vec3(0.299, 0.587, 0.114)); }
+// edges are found as if composited over the page (white, or the dark theme's near-black), so
+// silhouettes smooth like the original against either background
+float luma(vec4 c) { return dot(c.rgb + (1.0 - c.a) * mix(1.0, 0.07, uDark), vec3(0.299, 0.587, 0.114)); }
 void main() {
   vec2 px = 1.0 / uRes, uv = gl_FragCoord.xy * px;
   vec4 cM = texture(uC, uv);
@@ -864,7 +872,7 @@ void main() {
   float lB = luma(B);
   outC = (lB < lMin || lB > lMax) ? A : B;
 }`;
-const p3 = program(FRAG_FXAA, ['uC', 'uRes']);
+const p3 = program(FRAG_FXAA, ['uC', 'uRes', 'uDark']);
 let cTex = null;
 const cFbo = gl.createFramebuffer();
 
@@ -918,7 +926,8 @@ function uploadLabel() {
 async function setLabelText(text) {
   await fontReady;
   lctx.clearRect(0, 0, LABEL_W, LABEL_H);
-  lctx.font = `700 ${LABEL_PX}px "VenomGeist", system-ui, sans-serif`;
+  lctx.font = `600 ${LABEL_PX}px Inter, system-ui, sans-serif`;
+  lctx.letterSpacing = `${-0.025 * LABEL_PX}px`; // tracking-tight
   lctx.fillStyle = 'white';
   lctx.textAlign = 'center';
   lctx.textBaseline = 'alphabetic';
@@ -1640,7 +1649,8 @@ function render() {
   gl.uniform1i(u2.uArrowCol, 6);
   gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, arrowColTex);
   gl.uniform1f(u2.uMorph, hand.m);
-  gl.uniform1f(u2.uDark, root.classList.contains('dark') ? 1 : 0);
+  const dark = root.classList.contains('dark') ? 1 : 0;
+  gl.uniform1f(u2.uDark, dark);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
   // pass 3: FXAA to the screen
@@ -1648,6 +1658,7 @@ function render() {
   gl.useProgram(p3.prog);
   gl.uniform1i(p3.u.uC, 4);
   gl.uniform2f(p3.u.uRes, W, H);
+  gl.uniform1f(p3.u.uDark, dark);
   gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, cTex);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
