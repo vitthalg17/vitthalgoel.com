@@ -67,9 +67,9 @@ const strands = [];
 const crawlers = [];
 const ripples = [];
 // the Figma hand becomes a 3D object in the scene while the goo is engaged, so tendrils can wrap it
-// px per icon unit: the site cursor (css/cursors.css) draws the 24-unit icon at 20 CSS px, so the 3D icon
-// matches it exactly and the swap is invisible
-const HAND_SIZE = 20 / 24 / VIEW_SCALE;
+// px per icon unit: the site cursor (css/cursors.css) draws the 24-unit icon at 26 CSS px, so the 3D icon
+// matches it exactly and the swap is invisible (keep the two in sync)
+const HAND_SIZE = 26 / 24 / VIEW_SCALE;
 const hand = { m: 0, mV: 0, s: HAND_SIZE, v: 0, ang: 0, angV: 0, on: false, ready: false, coat: -60, coatV: 0, thr: 0.8,
   ox: 0, oy: 0, oxV: 0, oyV: 0 }; // ox/oy: how far the web has tugged the drawn icon off the real pointer
 const PULL_MAX = 10;        // px the web can tug the cursor icon
