@@ -641,7 +641,7 @@ vec3 shadeGoo(vec2 p, vec4 g) {
   spec = mix(spec, rough, matte);
 
   // jet black Venom on the light theme, white Anti-Venom on the dark theme
-  vec3 alb = mix(vec3(0.0007), vec3(0.6, 0.62, 0.66), uDark);
+  vec3 alb = mix(vec3(0.0007), vec3(0.32, 0.33, 0.36), uDark);
   vec3 diff = alb * (1.8 * max(dot(N, KEY), 0.0) * sh + 0.9 * ao);
   vec3 col = diff + spec;
 
@@ -650,7 +650,7 @@ vec3 shadeGoo(vec2 p, vec4 g) {
   vec2 bq = (p - uBtnP.xy) / uBtnP.zw + N.xy * 1.6;
   vec2 dsp = normalize(bq - vec2(uWin.x, -0.3) + 1e-4) * 0.02;
   vec3 win = vec3(faceWindow(bq + dsp).r, faceWindow(bq).g, faceWindow(bq - dsp).b);
-  col += win * matte * mix(0.6, 1.0, ao);
+  col += win * matte * mix(0.6, 1.0, ao) * mix(1.0, 4.0, uDark); // on white it needs more strength to read
 
   // rim light along the bevel: cool from the window side (top left), a softer warm kicker from the
   // bottom right, and a slow glint that travels around the contour so the edge catches and shines
@@ -662,6 +662,15 @@ vec3 shadeGoo(vec2 p, vec4 g) {
   float glint = pow(0.5 + 0.5 * cos(atan(cq.y, cq.x) - uTime * 0.9), 28.0);
   vec3 rimC = vec3(0.82, 0.9, 1.0) * rimL + vec3(1.0, 0.94, 0.86) * rimR + vec3(1.0) * glint * 1.4;
   col += rimC * bevel * 0.5 * (1.0 - strandness) * mix(0.7, 1.0, sh);
+
+  // white Anti-Venom: shaped like a white product shot, the edges pick up the dark room (black flags) and
+  // the face darkens slightly toward the bottom, so the white rim, glint and window highlights stand out
+  if (uDark > 0.0) {
+    float k = uDark * (1.0 - smoothstep(0.15, 0.5, strandness));
+    col *= 1.0 - 0.4 * uDark * bevel * (0.6 + 0.4 * (1.0 - rimL));
+    col *= 1.0 - 0.14 * k * smoothstep(-0.3, 1.0, cq.y);
+    col += rimC * bevel * 0.9 * k * mix(0.7, 1.0, sh);
+  }
 
   if (uLabelAmt > 0.0) {
     vec2 lu = (p - uLabelBox.xy) / (2.0 * uLabelBox.zw) + 0.5;
@@ -747,6 +756,7 @@ void main() {
   float a = 1.0;
   if (g.w < 0.5) {
     a = clamp(1.0 - luma(tonemap(floorShade(p, true))) / luma(tonemap(floorShade(p, false))), 0.0, 1.0);
+    a = min(1.0, a * mix(1.0, 1.6, uDark));
     // analytic edge coverage from the closest approach of the ray (also keeps hair-thin strands visible)
     float cov = clamp(0.5 - g.x * uDpr, 0.0, 1.0);
     if (cov > 0.0) {
