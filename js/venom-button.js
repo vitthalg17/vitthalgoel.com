@@ -62,17 +62,15 @@ const LIFT_H = 14;      // how far the whole slab rises off the floor on hover, 
 const BEVEL = 3;        // edge rounding of the slab: small = the shine runs right up to the border
 let labelInkW = 0;      // drawn width of the current label, canvas px
 
-// cursors from Figma "Cursors (Community)": left_ptr and hand2, rebuilt as 3D slabs in the scene
-const CUR_ARROW = `data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform='translate(3.96 -0.12)'%3E%3Cg%3E%3Cg filter='url(%23filter0_d_102_11)'%3E%3Cpath d='M2.16 17.76V0.96L14.28 13.1485H7.18952L6.75977 13.2786L2.16 17.76Z' fill-rule='evenodd' clip-rule='evenodd' fill='white'/%3E%3Cpath d='M10.7449 16.5635C11.1744 17.6016 10.6882 18.792 9.65484 19.2326C8.61036 19.678 7.40291 19.1896 6.96183 18.1434L2.88 8.46155L6.72302 6.84L10.7449 16.5635Z' fill-rule='evenodd' clip-rule='evenodd' fill='white'/%3E%3C/g%3E%3Cpath d='M9.77305 16.6772C10.0078 17.2234 9.74953 17.8559 9.19969 18.0818C8.66208 18.3028 8.04661 18.0515 7.81731 17.5174L4.92 10.7703L6.88612 9.96L9.77305 16.6772Z' fill-rule='evenodd' clip-rule='evenodd' fill='black'/%3E%3Cpath d='M3.12 3.48V15.12L6.21809 12.1382L6.6647 11.9936H11.64L3.12 3.48Z' fill-rule='evenodd' clip-rule='evenodd' fill='black'/%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='filter0_d_102_11' x='-8.9407e-08' y='0' width='15.72' height='22.0374' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0' result='hardAlpha'/%3E%3CfeOffset dx='-0.36' dy='0.84'/%3E%3CfeGaussianBlur stdDeviation='0.9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0'/%3E%3CfeBlend mode='normal' in2='BackgroundImageFix' result='effect1_dropShadow_102_11'/%3E%3CfeBlend mode='normal' in='SourceGraphic' in2='effect1_dropShadow_102_11' result='shape'/%3E%3C/filter%3E%3C/defs%3E%3C/g%3E%3C/svg%3E`;
-const CUR_HAND = `data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Cg filter='url(%23filter0_d_102_3)'%3E%3Cpath d='M6.99667 16.6967C6.66322 16.3018 6.25814 15.494 5.53722 14.5136C5.12861 13.9591 4.11533 12.9149 3.81358 12.3845C3.55174 11.9158 3.57992 11.7056 3.64214 11.3172C3.75252 10.6262 4.50866 10.0881 5.3153 10.1608C5.92469 10.2147 6.44131 10.5921 6.90626 10.9486C7.18688 11.1632 7.53209 11.5802 7.7399 11.8157C7.93129 12.0313 7.97826 12.1205 8.18256 12.3757C8.45261 12.7135 8.53715 12.8808 8.43383 12.5089C8.35046 11.9631 8.21426 11.0311 8.01701 10.207C7.86672 9.58199 7.83031 9.48406 7.68707 9.00431C7.5356 8.49376 7.45812 8.13614 7.31604 7.59479C7.21741 7.21187 7.04012 6.42954 6.99198 5.9894C6.92506 5.38752 6.88982 4.40603 7.30195 3.95489C7.62485 3.60168 8.36573 3.49495 8.82481 3.71282C9.42597 3.9978 9.76765 4.81645 9.92382 5.14325C10.2044 5.73083 10.3782 6.40973 10.5297 7.301C10.7222 8.43544 11.0768 10.01 11.0886 10.3412C11.16 10.824 11.0087 9.08023 11.0839 8.69071C11.152 8.3375 11.469 7.92708 11.8659 7.81595C12.2016 7.72242 12.595 7.68832 12.9414 7.75543C13.3088 7.82586 13.6963 8.07233 13.8408 8.3045C14.2658 8.99111 14.274 10.394 14.2916 10.3192C14.3926 9.90548 14.375 8.9669 14.6251 8.57628C14.7895 8.31881 15.2087 8.08663 15.4318 8.04923C15.7769 7.992 16.2008 7.9744 16.5636 8.04042C16.8559 8.09434 17.2517 8.42003 17.3585 8.57628C17.6144 8.9548 17.76 10.0254 17.8034 10.4006C17.8211 10.5558 17.8903 9.9693 18.1475 9.59079C18.6242 8.88768 20.3114 8.75123 20.376 10.2939C20.4054 11.0135 20.3995 10.9805 20.3995 11.4646C20.3995 12.0335 20.3855 12.3757 20.3526 12.7872C20.3161 13.2274 20.2152 14.222 20.0684 14.7041C20.0023 14.9208 19.8362 15.3146 19.6368 15.6862C19.4365 16.0595 19.1574 16.3814 18.8863 16.7071C18.5057 17.1643 17.9896 17.8381 17.9045 18.2218C17.7659 18.8401 17.8117 18.8446 17.7847 19.2836C17.7658 19.59 17.8429 19.9643 17.8909 20.1614C17.9084 20.2334 17.8602 20.3059 17.7865 20.3134C17.505 20.3417 16.8649 20.3946 16.4779 20.3366C16.0188 20.2673 15.4505 19.4112 15.3037 19.1494C15.1018 18.7884 14.6708 18.8578 14.503 19.124C14.2388 19.5455 13.6705 20.3014 13.269 20.3488C12.514 20.4377 10.9776 20.3869 9.72746 20.3723C9.65243 20.3714 9.59565 20.3027 9.60515 20.2283C9.64502 19.9157 9.69386 19.1741 9.31679 18.8765C8.95867 18.5915 8.34224 18.0138 7.97357 17.7101L6.99667 16.6967Z' fill-rule='evenodd' clip-rule='evenodd' fill='white'/%3E%3Cpath d='M6.99667 16.6967C6.66322 16.3018 6.25814 15.494 5.53722 14.5136C5.12861 13.9591 4.11533 12.9149 3.81358 12.3845C3.55174 11.9158 3.57992 11.7056 3.64214 11.3172C3.75252 10.6262 4.50866 10.0881 5.3153 10.1608C5.92469 10.2147 6.44131 10.5921 6.90626 10.9486C7.18688 11.1632 7.53209 11.5802 7.7399 11.8157C7.93129 12.0313 7.97826 12.1205 8.18256 12.3757C8.45261 12.7135 8.53715 12.8808 8.43383 12.5089C8.35046 11.9631 8.21426 11.0311 8.01701 10.207C7.86672 9.58199 7.83031 9.48406 7.68707 9.00431C7.5356 8.49376 7.45812 8.13614 7.31604 7.59479C7.21741 7.21187 7.04012 6.42954 6.99198 5.9894C6.92505 5.38752 6.88982 4.40603 7.30195 3.95489C7.62485 3.60168 8.36573 3.49495 8.82481 3.71282C9.42597 3.9978 9.76765 4.81645 9.92382 5.14325C10.2044 5.73083 10.3782 6.40973 10.5297 7.301C10.7222 8.43544 11.0768 10.01 11.0886 10.3412C11.16 10.824 11.0087 9.08023 11.0839 8.69071C11.152 8.3375 11.469 7.92708 11.8659 7.81595C12.2016 7.72242 12.595 7.68832 12.9414 7.75543C13.3088 7.82586 13.6963 8.07233 13.8408 8.3045C14.2658 8.99111 14.274 10.394 14.2916 10.3192C14.3926 9.90548 14.375 8.9669 14.6251 8.57628C14.7895 8.31881 15.2087 8.08663 15.4318 8.04923C15.7769 7.992 16.2008 7.9744 16.5636 8.04042C16.8559 8.09434 17.2517 8.42003 17.3585 8.57628C17.6144 8.9548 17.76 10.0254 17.8034 10.4006C17.8211 10.5558 17.8903 9.9693 18.1475 9.59078C18.6242 8.88768 20.3114 8.75123 20.376 10.2939C20.4054 11.0135 20.3995 10.9805 20.3995 11.4646C20.3995 12.0335 20.3855 12.3757 20.3526 12.7872C20.3161 13.2274 20.2152 14.222 20.0684 14.7041C20.0023 14.9208 19.8362 15.3146 19.6368 15.6862C19.4365 16.0595 19.1574 16.3814 18.8863 16.7071C18.5057 17.1643 17.9896 17.8381 17.9045 18.2218C17.7659 18.8401 17.8117 18.8446 17.7847 19.2836C17.7658 19.59 17.8429 19.9643 17.8909 20.1614C17.9084 20.2334 17.8602 20.3059 17.7865 20.3134C17.505 20.3417 16.8649 20.3946 16.4779 20.3366C16.0188 20.2673 15.4505 19.4112 15.3037 19.1494C15.1018 18.7884 14.6708 18.8578 14.503 19.124C14.2388 19.5455 13.6705 20.3014 13.269 20.3488C12.514 20.4377 10.9776 20.3869 9.72746 20.3723C9.65243 20.3714 9.59565 20.3027 9.60515 20.2283C9.64502 19.9157 9.69386 19.1741 9.31679 18.8765C8.95867 18.5915 8.34224 18.0138 7.97357 17.7101L6.99667 16.6967Z' stroke-width='0.96' stroke='black'/%3E%3C/g%3E%3Cpath d='M16.68 17.04V13.32' stroke-width='0.84' stroke-linecap='round' stroke='black'/%3E%3Cpath d='M14.52 17.04V13.32' stroke-width='0.84' stroke-linecap='round' stroke='black'/%3E%3Cpath d='M11.88 13.32V17.04' stroke-width='0.84' stroke-linecap='round' stroke='black'/%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='filter0_d_102_3' x='0.960123' y='2.16004' width='21.3599' height='21.3599' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0' result='hardAlpha'/%3E%3CfeOffset dx='-0.36' dy='0.84'/%3E%3CfeGaussianBlur stdDeviation='0.9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0'/%3E%3CfeBlend mode='normal' in2='BackgroundImageFix' result='effect1_dropShadow_102_3'/%3E%3CfeBlend mode='normal' in='SourceGraphic' in2='effect1_dropShadow_102_3' result='shape'/%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E`;
 
 const strands = [];
 const crawlers = [];
 const ripples = [];
 // the Figma hand becomes a 3D object in the scene while the goo is engaged, so tendrils can wrap it
-const HAND_BIG = 2.3;       // px per icon unit when hovering: 24px icon → ~55px
-const HAND_SMALL = 0.84 / VIEW_SCALE; // about the size of the OS cursor, so the swap in is seamless before it grows
-const hand = { m: 0, mV: 0, s: HAND_SMALL, want: false, v: 0, ang: 0, angV: 0, on: false, ready: false, coat: -60, coatV: 0, thr: 0.8,
+// px per icon unit: the site cursor (css/cursors.css) draws the 24-unit icon at 20 CSS px, so the 3D icon
+// matches it exactly and the swap is invisible
+const HAND_SIZE = 20 / 24 / VIEW_SCALE;
+const hand = { m: 0, mV: 0, s: HAND_SIZE, v: 0, ang: 0, angV: 0, on: false, ready: false, coat: -60, coatV: 0, thr: 0.8,
   ox: 0, oy: 0, oxV: 0, oyV: 0 }; // ox/oy: how far the web has tugged the drawn icon off the real pointer
 const PULL_MAX = 10;        // px the web can tug the cursor icon
 const TILT_MAX = 0.36;      // rad the pull can turn the hand (~20°)
@@ -792,8 +790,11 @@ const p2 = program(FRAG_SHADE, ['uG', 'uLabel', 'uRes', 'uDpr', 'uTime', 'uLabel
 const handColTex = gl.createTexture(), handSdfTex = gl.createTexture();
 const arrowColTex = gl.createTexture(), arrowSdfTex = gl.createTexture();
 let iconsLoaded = 0;
-function buildIcon(dataUrl, colTex, sdfTex) {
-  const svg = decodeURIComponent(dataUrl.slice(dataUrl.indexOf(',') + 1))
+function buildIcon(cssVar, colTex, sdfTex) {
+  // the same icons the page uses as its cursors (css/cursors.css)
+  const raw = getComputedStyle(root).getPropertyValue(cssVar).trim();
+  if (!raw) return;
+  const svg = decodeURIComponent(raw.slice(raw.indexOf(',') + 1, raw.lastIndexOf('"')))
     .replace(/\sfilter=(["'])url\([^)]*\)\1/g, ''); // the 3D render casts its own shadow
   const img = new Image();
   img.onload = () => {
@@ -842,8 +843,8 @@ function buildIcon(dataUrl, colTex, sdfTex) {
   };
   img.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
-buildIcon(CUR_HAND, handColTex, handSdfTex);
-buildIcon(CUR_ARROW, arrowColTex, arrowSdfTex);
+buildIcon('--cur-hand', handColTex, handSdfTex);
+buildIcon('--cur-arrow', arrowColTex, arrowSdfTex);
 const vao = gl.createVertexArray();
 
 // Pass 3: FXAA, smooths silhouettes, the hand outline and specular sparkle on thin strands
@@ -1434,18 +1435,14 @@ function step(dt) {
   for (let i = 0; i < strands.length; i++) stepStrand(strands[i], dt, g, present, inside);
   for (let i = strands.length - 1; i >= 0; i--) if (strands[i].dead) strands.splice(i, 1);
 
-  // the 3D icon stands in for the OS cursor only near the button: it takes over at the OS cursor's size,
-  // grows to full size, and shrinks back down before handing over again
+  // the 3D icon stands in for the site cursor only near the button, at the same size and colour
   const wrapped = strands.some((s) => s.wrap);
   const engage = !reduced && hand.ready && present && (e.d < P.reach + 40 || inside || wrapped);
-  hand.want = hand.ready && present && cur.mouse && (e.d < P.reach + 40 || inside || wrapped);
-  spring(hand, 's', 'v', hand.want ? HAND_BIG : HAND_SMALL, 16, 0.9, dt);
   // engulf front: hand parts within this many px of the button get coated; over the button it seals completely
   spring(hand, 'coat', 'coatV', inside ? 160 : present ? clamp(45 - e.d, -60, 160) : -60, 9, 0.9, dt);
   const thrT = inside ? 0.57 : 0.8 - 0.2 * clamp(1 - e.d / 60, 0, 1); // ~35% coverage at most
   hand.thr += (thrT - hand.thr) * (1 - Math.exp(-dt * 4));
-  hand.on = hand.ready && cur.present && cur.mouse && (hand.want || hand.s > HAND_SMALL * 1.2);
-  if (!hand.on) { hand.s = HAND_SMALL; hand.v = 0; }
+  hand.on = hand.ready && present && cur.mouse && (e.d < P.reach + 40 || inside || wrapped);
   // arrow → hand the instant the goo is about to touch: a lunging tendril past halfway, a latch, or the body
   const touching = inside || strands.some((s) => s.kind === 'reach' && (s.state === 'attached' || (s.state === 'grow' && s.u > 0.5)));
   spring(hand, 'm', 'mV', (engage && touching) || (hand.on && inside) ? 1 : 0, 32, 1.0, dt);
