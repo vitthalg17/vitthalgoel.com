@@ -843,8 +843,11 @@ function buildIcon(cssVar, colTex, sdfTex) {
   };
   img.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
-buildIcon('--cur-hand', handColTex, handSdfTex);
-buildIcon('--cur-arrow', arrowColTex, arrowSdfTex);
+function buildIcons() {
+  buildIcon('--cur-hand', handColTex, handSdfTex);
+  buildIcon('--cur-arrow', arrowColTex, arrowSdfTex);
+}
+buildIcons();
 const vao = gl.createVertexArray();
 
 // Pass 3: FXAA, smooths silhouettes, the hand outline and specular sparkle on thin strands
@@ -1739,9 +1742,10 @@ function setEngaged(on) {
 
 // only light and dark mode get the goo: the Star Wars theme keeps its own button. Off screen, nothing runs
 const swActive = () => root.classList.contains('sw');
-let wasSw = swActive();
+let wasSw = swActive(), wasDark = root.classList.contains('dark');
 function sync() {
-  const sw = swActive();
+  const sw = swActive(), dark = root.classList.contains('dark');
+  if (dark !== wasDark) { wasDark = dark; buildIcons(); } // the cursors invert in dark mode
   if (wasSw && !sw) { btn.intro = reduced ? 1 : 0; btn.introV = 0; } // grow back out of a puddle
   wasSw = sw;
   const on = started && onScreen && !sw;
