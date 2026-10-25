@@ -852,6 +852,7 @@ precision highp float;
 uniform sampler2D uC;
 uniform vec2 uRes;
 uniform float uDark;
+uniform vec4 uNoAA;  // device-pixel rect (gl_FragCoord space) around the lettering, left untouched
 out vec4 outC;
 // edges are found as if composited over the page (white, or the dark theme's near-black), so
 // silhouettes smooth like the original against either background
@@ -859,6 +860,7 @@ float luma(vec4 c) { return dot(c.rgb + (1.0 - c.a) * mix(1.0, 0.07, uDark), vec
 void main() {
   vec2 px = 1.0 / uRes, uv = gl_FragCoord.xy * px;
   vec4 cM = texture(uC, uv);
+  if (all(greaterThan(gl_FragCoord.xy, uNoAA.xy)) && all(lessThan(gl_FragCoord.xy, uNoAA.zw))) { outC = cM; return; }
   float lNW = luma(texture(uC, uv + vec2(-1.0, -1.0) * px)), lNE = luma(texture(uC, uv + vec2(1.0, -1.0) * px));
   float lSW = luma(texture(uC, uv + vec2(-1.0, 1.0) * px)), lSE = luma(texture(uC, uv + vec2(1.0, 1.0) * px));
   float lM = luma(cM);
@@ -872,7 +874,7 @@ void main() {
   float lB = luma(B);
   outC = (lB < lMin || lB > lMax) ? A : B;
 }`;
-const p3 = program(FRAG_FXAA, ['uC', 'uRes', 'uDark']);
+const p3 = program(FRAG_FXAA, ['uC', 'uRes', 'uDark', 'uNoAA']);
 let cTex = null;
 const cFbo = gl.createFramebuffer();
 
@@ -923,22 +925,39 @@ function uploadLabel() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 }
 
-async function setLabelText(text) {
-  await fontReady;
-  lctx.clearRect(0, 0, LABEL_W, LABEL_H);
-  lctx.font = `600 ${LABEL_PX}px Inter, system-ui, sans-serif`;
-  lctx.letterSpacing = `${-0.025 * LABEL_PX}px`; // tracking-tight
+let labelText = '', labelTexW = LABEL_W, labelTexH = LABEL_H;
+function labelFont(px) {
+  lctx.font = `600 ${px}px Inter, system-ui, sans-serif`;
+  lctx.letterSpacing = `${-0.025 * px}px`; // tracking-tight
   lctx.fillStyle = 'white';
   lctx.textAlign = 'center';
   lctx.textBaseline = 'alphabetic';
+}
+async function setLabelText(text) {
+  await fontReady;
+  labelText = text;
+  labelFont(LABEL_PX);
   const m = lctx.measureText(text);
-  lctx.fillText(text, LABEL_W / 2, LABEL_H / 2 + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
-  labelInkW = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
-  uploadLabel();
+  labelInkW = m.actualBoundingBoxLeft + m.actualBoundingBoxRight; // design px, sizes the pill
   labelAmt = 0; labelTarget = 1;
   resize();
 }
-setLabelText(LABEL_TEXT);
+// the label texture is rasterised at the exact device-pixel size it is shown at (one texel per screen
+// pixel, snapped to the pixel grid in render()), so the letters come out as crisp as the page's own text
+function drawLabel() {
+  if (!labelText) return;
+  const sc = LABEL_CSS / LABEL_PX;
+  labelTexW = 2 * Math.max(1, Math.round((LABEL_W * sc * DPR) / 2));
+  labelTexH = 2 * Math.max(1, Math.round((LABEL_H * sc * DPR) / 2));
+  const k = labelTexW / LABEL_W;
+  labelCanvas.width = labelTexW; labelCanvas.height = labelTexH; // also clears it
+  labelFont(LABEL_PX * k);
+  const m = lctx.measureText(labelText);
+  lctx.fillText(labelText, labelTexW / 2, labelTexH / 2 + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
+  btn.lbw = labelTexW / (2 * DPR);
+  btn.lbh = labelTexH / (2 * DPR);
+  uploadLabel();
+}
 
 // ───────────────────────────── geometry helpers ─────────────────────────────
 function geo() {
@@ -1572,7 +1591,9 @@ function render() {
   ripBuf.fill(0);
   ripples.forEach((r, i) => ripBuf.set([r.x, r.y, r.age, r.amp], i * 4));
 
-  const lb = [g.cx, g.cy + LABEL_NUDGE, btn.lbw, btn.lbh];
+  // label box with its top-left corner on a device pixel, so texels land exactly on screen pixels
+  const lb = [(Math.round(g.cx * DPR - labelTexW / 2) + labelTexW / 2) / DPR,
+    (Math.round((g.cy + LABEL_NUDGE) * DPR - labelTexH / 2) + labelTexH / 2) / DPR, btn.lbw, btn.lbh];
   const time2 = reduced ? 3 : time;
 
   // pass 1
@@ -1634,7 +1655,7 @@ function render() {
   gl.uniform1f(u2.uTime, time2);
   gl.uniform4f(u2.uLabelBox, lb[0], lb[1], lb[2], lb[3]);
   gl.uniform1f(u2.uLabelAmt, labelAmt);
-  gl.uniform1f(u2.uLabelLod, Math.max(0, Math.log2(LABEL_W / (2 * lb[2] * DPR)) - 0.6)); // crisp letters
+  gl.uniform1f(u2.uLabelLod, 0); // the texture already matches the screen
   gl.uniform1f(u2.uIri, P.sheen);
   gl.uniform1f(u2.uZMax, zTop);
   gl.uniform1f(u2.uLift, btn.lift);
@@ -1659,6 +1680,8 @@ function render() {
   gl.uniform1i(p3.u.uC, 4);
   gl.uniform2f(p3.u.uRes, W, H);
   gl.uniform1f(p3.u.uDark, dark);
+  const noX = (inkHalf + 3) * DPR, noY = LABEL_CSS * 0.62 * DPR;
+  gl.uniform4f(p3.u.uNoAA, lb[0] * DPR - noX, H - lb[1] * DPR - noY, lb[0] * DPR + noX, H - lb[1] * DPR + noY);
   gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, cTex);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
@@ -1684,12 +1707,13 @@ function layoutButton() {
 }
 function resize() {
   layoutButton();
-  const dpr = Math.min(devicePixelRatio || 1, 2) * quality;
+  const dpr = 2 * quality; // 2x even on 1x screens: supersampled goo and lettering downscale cleanly
   W = Math.max(1, Math.round(viewWv * VIEW_SCALE * dpr));
   H = Math.max(1, Math.round(viewHv * VIEW_SCALE * dpr));
   canvas.width = W; canvas.height = H;
   DPR = W / viewW(); // device pixels per virtual px: the scale-down happens here
   makeGBuffer();
+  drawLabel();
 }
 
 let last = performance.now(), acc = 0, frameEma = 1 / 60, slowFor = 0;
