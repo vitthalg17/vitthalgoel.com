@@ -12,9 +12,13 @@ export default function ProfilePic() {
       <img
         ref={picRef}
         id="profile-pic"
+        // Inside the Venom button's canvas, but not part of it: without this
+        // the goo reaches for a cursor hovering the picture and swaps in its
+        // 3D hand, which the reveal's snapshot then freezes on screen.
+        data-venom-ignore=""
         className="inline-flex rounded-full shadow-lg mb-4"
         style={{ touchAction: 'manipulation' }}
-        src="/images/unnamed.jpg"
+        src="/images/unnamed.webp"
         width={48}
         height={48}
         alt="Vitthal Goel"

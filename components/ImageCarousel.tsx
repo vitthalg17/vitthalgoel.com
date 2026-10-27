@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react'
 
 const IMAGES = [
-  '/images/header-image-01.png',
-  '/images/header-image-02.png',
-  '/images/header-image-03.png',
+  '/images/header-image-01.webp',
+  '/images/header-image-02.webp',
+  '/images/header-image-03.webp',
 ]
 
 // Plain <img> rather than next/image on purpose: next/image wraps its output,

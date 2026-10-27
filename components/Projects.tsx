@@ -1,11 +1,11 @@
 const PROJECTS = [
   {
-    image: '/images/summix.png',
+    image: '/images/summix.webp',
     title: 'Summix - AI Powered PDF Summarizer',
     href: 'https://summix.vitthalgoel.com',
   },
   {
-    image: '/images/tasktide.png',
+    image: '/images/tasktide.webp',
     title: 'TaskTide - Task Manager (FastAPI Project)',
     href: 'https://tasktide.vitthalgoel.com',
   },

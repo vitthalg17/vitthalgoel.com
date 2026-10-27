@@ -20,7 +20,7 @@ const ENTRIES = [
     body: 'Full-time Software Engineering Internship',
   },
   {
-    logo: '/images/Amity.png',
+    logo: '/images/Amity.webp',
     alt: 'Amity University logo',
     period: '2024 - 2028',
     title: 'Amity University',
@@ -30,7 +30,7 @@ const ENTRIES = [
     body: 'Bachelors of Technology in Artifical Intelligence',
   },
   {
-    logo: '/images/MRIS.png',
+    logo: '/images/MRIS.webp',
     alt: 'Manav Rachna International School logo',
     period: '2011 - 2024',
     title: 'Manav Rachna International School',

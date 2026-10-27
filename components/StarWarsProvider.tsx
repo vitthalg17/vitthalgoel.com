@@ -37,6 +37,17 @@ export function useStarWars() {
   return context
 }
 
+// A shockwave ring's diameter and opacity at one end of its animation.
+type Ring = { d: number; o: number }
+// [line width, alpha] strokes, widest first: a soft gold glow with a crisp 2px ring on top
+const GLOW: [number, number][] = [
+  [34, 0.05],
+  [22, 0.1],
+  [12, 0.2],
+  [6, 0.35],
+  [2, 1],
+]
+
 type Geometry = { x: number; y: number; r0: number; far: number }
 type Reveal = {
   target: boolean
@@ -62,7 +73,7 @@ export default function StarWarsProvider({
   children: React.ReactNode
 }) {
   const picRef = useRef<HTMLImageElement>(null)
-  const wavesRef = useRef<HTMLDivElement>(null)
+  const wavesRef = useRef<HTMLCanvasElement>(null)
   const exitRef = useRef<() => void>(() => {})
   const [hyperspace, setHyperspace] = useState(false)
   const [prompting, setPrompting] = useState(false)
@@ -127,22 +138,69 @@ export default function StarWarsProvider({
     }
     const circle = (g: Geometry, r: number) => `circle(${r}px at ${g.x}px ${g.y}px)`
 
-    // gold rings riding the edge of the reveal: blasting out from the picture, or collapsing back into it
+    // Gold rings riding the edge of the reveal: blasting out from the picture,
+    // or collapsing back into it. They used to be three elements animating
+    // width/height with blurred box-shadows, which made the browser repaint
+    // screen-sized layers every frame and dropped the reveal to ~10fps. Now
+    // the timing lives in target-less Web Animations (so they still reverse
+    // and finish like before) and one canvas draws the rings from them, with
+    // the glow built from a few wide, faint strokes instead of a blur.
+    const ctx = wavesEl.getContext('2d')
+    let waves: { anim: Animation; from: Ring; to: Ring }[] = []
+    let wavesRaf = 0
+    let lastGeo: Geometry = { x: 0, y: 0, r0: 0, far: 0 } // where the current rings are centred
+
+    function drawWaves() {
+      wavesRaf = 0
+      if (!ctx || !waves.length) return
+      ctx.clearRect(0, 0, innerWidth, innerHeight)
+      for (const { anim, from, to } of waves) {
+        const t = anim.effect?.getComputedTiming().progress
+        if (t == null) continue
+        const r = (from.d + (to.d - from.d) * t) / 2
+        const o = from.o + (to.o - from.o) * t
+        if (o <= 0.001 || r <= 1) continue
+        ctx.beginPath()
+        ctx.arc(lastGeo.x, lastGeo.y, r - 1, 0, Math.PI * 2)
+        for (const [width, alpha] of GLOW) {
+          ctx.lineWidth = width
+          ctx.strokeStyle = `rgba(255, 232, 31, ${alpha * o})`
+          ctx.stroke()
+        }
+      }
+      wavesRaf = requestAnimationFrame(drawWaves)
+    }
+
+    function clearWaves() {
+      waves = []
+      cancelAnimationFrame(wavesRaf)
+      wavesRaf = 0
+      ctx?.clearRect(0, 0, innerWidth, innerHeight)
+    }
+
     function makeWaves(g: Geometry, out: boolean, timing: typeof EXPAND) {
-      wavesEl!.textContent = ''
-      return [0, 1, 2].map((i) => {
-        const w = document.createElement('div')
-        w.className = 'sw-wave'
-        w.style.left = `${g.x}px`
-        w.style.top = `${g.y}px`
-        wavesEl!.appendChild(w)
+      clearWaves()
+      lastGeo = g
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      wavesEl!.width = Math.round(innerWidth * dpr)
+      wavesEl!.height = Math.round(innerHeight * dpr)
+      ctx?.setTransform(dpr, 0, 0, dpr, 0, 0)
+      const anims = [0, 1, 2].map((i) => {
         const small = 2 * g.r0
         const big = 2 * g.far * (out ? 1 - 0.16 * i : 1 + 0.12 * i)
         const strength = 1 - 0.28 * i
-        const a = { width: `${small}px`, height: `${small}px`, opacity: out ? strength : 1 }
-        const b = { width: `${big}px`, height: `${big}px`, opacity: out ? 0 : strength * 0.4 }
-        return w.animate(out ? [a, b] : [b, a], { ...timing, fill: 'both' })
+        const a = { d: small, o: out ? strength : 1 }
+        const b = { d: big, o: out ? 0 : strength * 0.4 }
+        const anim = new Animation(
+          new KeyframeEffect(null, null, { ...timing, fill: 'both' }),
+          document.timeline
+        )
+        anim.play()
+        waves.push({ anim, from: out ? a : b, to: out ? b : a })
+        return anim
       })
+      drawWaves()
+      return anims
     }
 
     function punch() {
@@ -156,7 +214,7 @@ export default function StarWarsProvider({
       if (run !== r) return
       run = null
       apply(r.target) // after a reversal this puts the page back where it started
-      wavesEl!.textContent = ''
+      clearWaves()
       delete html.dataset.swAnim
       reconcile()
     }
@@ -222,7 +280,7 @@ export default function StarWarsProvider({
       run = null
       r.waves.forEach((a) => a.cancel())
       r.transition?.skipTransition()
-      wavesEl!.textContent = ''
+      clearWaves()
       delete html.dataset.swAnim
     }
 
@@ -348,6 +406,7 @@ export default function StarWarsProvider({
       clearTimeout(hoverTimer)
       clearTimeout(promptTimer)
       cancel()
+      clearWaves()
       html.classList.remove('sw')
       exitRef.current = () => {}
     }
@@ -361,7 +420,7 @@ export default function StarWarsProvider({
   return (
     <StarWarsContext.Provider value={value}>
       <Hyperspace active={hyperspace} />
-      <div id="sw-waves" ref={wavesRef} aria-hidden="true" />
+      <canvas id="sw-waves" ref={wavesRef} aria-hidden="true" />
       {children}
     </StarWarsContext.Provider>
   )

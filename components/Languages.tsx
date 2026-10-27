@@ -1,24 +1,24 @@
 const LANGUAGES = [
   {
-    logo: '/images/logos/Python.png',
+    logo: '/images/logos/Python.webp',
     alt: 'Python Logo',
     name: 'Python',
     body: 'Proficient in Python for AI/ML, web development, and scripting.',
   },
   {
-    logo: '/images/logos/JavaScript.png',
+    logo: '/images/logos/JavaScript.webp',
     alt: 'JavaScript Logo',
     name: 'JavaScript',
     body: 'Experienced in JavaScript for web development, including frontend frameworks.',
   },
   {
-    logo: '/images/logos/HTMLCSS.png',
+    logo: '/images/logos/HTMLCSS.webp',
     alt: 'HTML & CSS Logo',
     name: 'HTML & CSS',
     body: 'Proficient in HTML and CSS for building responsive and accessible web interfaces.',
   },
   {
-    logo: '/images/logos/C.png',
+    logo: '/images/logos/C.webp',
     alt: 'C Language Logo',
     name: 'C',
     body: 'Strong foundation in C programming for system-level and embedded applications.',
