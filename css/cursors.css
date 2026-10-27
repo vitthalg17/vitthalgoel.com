@@ -32,7 +32,7 @@ input[type="radio"],
 input[type="submit"],
 input[type="button"],
 .bb8-toggle,
-.sw-hint-close,
+#profile-pic,
 html.sw .star-btn {
     cursor: var(--cur-hand) 9 3, pointer !important;
 }

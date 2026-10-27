@@ -136,61 +136,14 @@ html.sw footer p {
     color: #FFE81F !important;
 }
 
-/* Easter-egg hint — appears under the profile picture after 30s on the page */
-.sw-hint-anchor {
+/* Profile picture — the way into the easter egg (js/sw-egg.js). After 30s a
+   pulsing gold glow and sonar rings prompt undiscovered visitors to click it. */
+.sw-pfp {
     position: relative;
     display: inline-block;
 }
 
-.sw-hint {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%) translateY(4px);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    background: #FFE81F;
-    color: #111827;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    padding: 4px 6px 4px 11px;
-    border-radius: 999px;
-    box-shadow: 0 0 14px rgba(255, 232, 31, 0.7);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.45s ease, transform 0.45s ease;
-    z-index: 6;
-}
-
-/* Dismiss (×) button inside the hint */
-.sw-hint-close {
-    pointer-events: auto;
-    flex: none;
-    width: 15px;
-    height: 15px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.18);
-    color: #111827;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sw-hint-close:hover {
-    background: rgba(0, 0, 0, 0.35);
-}
-
-/* Yellow glow on the profile picture while the hint is showing */
-#profile-pic.sw-glow {
+.sw-prompt #profile-pic {
     box-shadow: 0 0 0 2px #FFE81F, 0 0 18px 5px rgba(255, 232, 31, 0.7);
     animation: sw-glow-pulse 1.6s ease-in-out infinite;
 }
@@ -200,28 +153,85 @@ html.sw footer p {
     50% { box-shadow: 0 0 0 2px #FFE81F, 0 0 24px 7px rgba(255, 232, 31, 0.85); }
 }
 
-/* Little downward arrow pointing at the profile picture */
-.sw-hint::after {
+/* sonar rings rippling out of the picture (48px, top of the wrapper) */
+.sw-prompt::before,
+.sw-prompt::after {
     content: "";
     position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid #FFE81F;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    border: 2px solid #FFE81F;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sw-sonar 2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
 }
 
-.sw-hint.show {
-    opacity: 1;
-    animation: sw-hint-bounce 1.6s ease-in-out infinite;
+.sw-prompt::after {
+    animation-delay: 1s;
 }
 
-@keyframes sw-hint-bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-4px); }
+@keyframes sw-sonar {
+    0% { transform: scale(1); opacity: 0.9; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sw-prompt #profile-pic,
+    .sw-prompt::before,
+    .sw-prompt::after {
+        animation: none;
+    }
+}
+
+/* Shockwaves that blast out of (or collapse into) the picture as the theme
+   spreads; their own view-transition layer keeps them above the reveal */
+#sw-waves {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    view-transition-name: sw-waves;
+}
+
+.sw-wave {
+    position: absolute;
+    border: 2px solid #FFE81F;
+    border-radius: 50%;
+    box-shadow: 0 0 16px 2px rgba(255, 232, 31, 0.55), inset 0 0 16px 2px rgba(255, 232, 31, 0.35);
+    transform: translate(-50%, -50%);
+}
+
+/* The theme reveal: a circle clip animated from js/sw-egg.js replaces the
+   default cross-fade. Expanding grows the new (themed) page out of the
+   picture; collapsing shrinks the old one back into it, so it goes on top. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+/* the page stays clickable while the reveal plays */
+::view-transition {
+    pointer-events: none;
+}
+
+html[data-sw-anim="collapse"]::view-transition-old(root) {
+    z-index: 2;
+}
+
+::view-transition-group(sw-waves),
+::view-transition-new(sw-waves) {
+    animation: none;
+}
+
+::view-transition-group(sw-waves) {
+    z-index: 3;
+}
+
+::view-transition-old(sw-waves) {
+    display: none;
 }
 
 /* Contact form — transparent fields + yellow accents */

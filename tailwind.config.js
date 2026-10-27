@@ -2,6 +2,8 @@ module.exports = {
   content: [
     './**/*.html',
     './js/**/*.js',
+    // WebGL code with no Tailwind classes; its words (truncate, sticky, ...) would generate unused utilities
+    '!./js/venom-button.js',
   ],
   darkMode: 'class',
   theme: {
